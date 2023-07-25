@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\api\authController;
-use App\Http\Controllers\api\bukuController;
-use App\Http\Controllers\api\kategoriController;
+use App\Http\Controllers\API\authController;
+use App\Http\Controllers\API\bukuController;
+use App\Http\Controllers\API\kategoriController;
 use App\Http\Controllers\API\novelController;
 use App\Http\Controllers\API\userController;
 use Illuminate\Http\Request;
