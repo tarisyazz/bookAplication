@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Hash;
 class authController extends Controller
 {
 // register -- approved
-
     public function registrasi(Request $request)
     {
         $fields = $request->all();
@@ -89,7 +88,11 @@ class authController extends Controller
             'nama' => $fields['nama'],
             'username' => $fields['username'],
             'email' => $fields['email'],
-            'password'=> bcrypt($fields['password'])
+            'password'=> bcrypt($fields['password']),
+            'jenisKelamin' => $fields['jenisKelamin'],
+            'tempatLahir' =>$fields['tempatLahir'],
+            'tanggalLahir' => $fields['tanggalLahir'],
+            'alamat' => $fields['alamat']
         ]);
 
         $response = [
@@ -126,8 +129,10 @@ class authController extends Controller
         ]))
         {
             $auth = Auth::user();
-            $data['id'] = $auth->id;
-            $data['nama'] = $auth->nama;
+            $data = User::select('*')->get();
+            $data = $data->where('id', $auth->id);
+            // $data['id'] = $auth->id;
+            // $data['nama'] = $auth->nama;
             $data['token'] = $auth->createToken('token')->plainTextToken;
 
             $response = [
@@ -178,39 +183,18 @@ class authController extends Controller
         }
     }
 
-    //
-    // public function onlyKategori(Request $request)
-    // {
-    //     $data = kategori::select('*');
+    // ini kategori yang dulu
+    public function onlyKategori()
+    {
+        $show = kategori::with('buku.kategori')->select('*')->get();
 
-    //     if(!empty($data))
-    //     {
-    //         $show = kategori::with('buku.kategori')->where('namaKategori', 'ilike','%'.$request->req.'%')->paginate(100);
-
-    //         $response = [
-    //             'success' => true,
-    //             'message' => 'Data Buku kategori',
-    //             'data' => $data 
-    //         ];
-    //     return response($response, 200);
-    //     }
-
-    //     return  kategori::with('buku.kategori')->where('namaKategori', 'ilike','%'.$request->req.'%')->paginate(100);
-
-    //     if(!empty($request->req))
-    //     {
-    //         $data = $data->where('namaKategori', 'lIKE', '%'.$request->req.'%');
-    //     }
-        
-    //     // $response = [
-    //     //     'success' => true,
-    //     //     'message' => 'Data Buku kategori',
-    //     //     'data' => $data 
-    //     // ];
-
-    //     // return response($response, 200);
-
-    // }
+        $response = [
+            'success' => true,
+            'message' => 'Data Buku kategori',
+            'data' => $show
+        ];
+        return response($response, 200);
+    }
 
     // select data per kategori
     public function getDataKategori($kategori)
@@ -219,7 +203,7 @@ class authController extends Controller
 
         if(!empty($coba))
         {
-            $data = $coba->where('namaKategori', 'ilike', '%' . $kategori . '%')->get();
+            $data = $coba->where('namaKategori', $kategori )->get();
 
             $response = [
                 'success' => true,
@@ -276,30 +260,17 @@ class authController extends Controller
                 'data' => $data
             ];
             return response($response, 200);
-        // }
-        // else
-        // {
-        //     $response = [
-        //         'success' => false,
-        //         'message' => 'Data tidak ditemukan!',
-        //         'data' => null 
-        //     ];
-        //     return response($response, 422);
-        // }
+            // }
+            // else
+            // {
+            //     $response = [
+            //         'success' => false,
+            //         'message' => 'Data tidak ditemukan!',
+            //         'data' => null 
+            //     ];
+            //     return response($response, 422);
+            // }
     }
-
-    // public function dataProfile()
-    // {
-    //     $data = book::select('nama', 'username', 'email', 'jenisKelamin', 'tempatLahir', 'tanggalLahir', 'alamat')->get();
-
-    //     // $data = $data->orderBy('created_at', 'DESC');
-        
-    //     $response = [
-    //         'success' => true,
-    //         'message' => 'Data Buku',
-    //         'data' => $data 
-    //     ];
-    //     return response($response, 200);
-    // }
+    //
 //
 }
