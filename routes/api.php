@@ -19,23 +19,38 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/register', [authController::class, 'registrasi'])->name('register.registrasi');
-Route::post('/login', [authController::class, 'login'])->name('login.login');
+Route::post('/register', [authController::class, 'registrasi']); // ini yang rika
+Route::post('/getRegister', [authController::class, 'get_registrasi']); // ini yang nida
+Route::post('/login', [authController::class, 'login']);
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    // route::resource('kategori', kategoriController::class, [
-    //     'except' => ['show']
-    // ]);
-    Route::get('/buku', [authController::class, 'allData']);
-    Route::get('/kategori/buku', [authController::class, 'onlyKategori']);
-    Route::get('/search/{judul}', [authController::class, 'search']);
-    Route::get('/details/buku/{judul}', [authController::class, 'details']);
 
-    Route::get('/details-buku/buku/{id}', [authController::class, 'get_details']);
+    // -- data buku
+    Route::get('/buku', [authController::class, 'allData']); // liat semua data
+    Route::get('/kategori/data/buku/{namaKategori}', [authController::class, 'getDataKategori']); // liat data sesuai kategori
+    Route::get('/showDetails/{id}', [authController::class, 'get_details']); // ini buat liat details buku
+
+
+
+    Route::get('/kategori/buku', [authController::class, 'onlyKategori']); // ini belum
+
+
+
+
+
+    Route::get('/buku/judul/{judul}', [authController::class, 'search']);
+
+    Route::get('/allProfile', [authController::class, 'dataProfile']);
+
+
+
 
 
     route::post('/logout', [authController::class, 'logout']);
 });
+
+
+
 
 
 // trash 

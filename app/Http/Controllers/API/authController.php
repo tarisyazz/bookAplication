@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Hash;
 class authController extends Controller
 {
 // register -- approved
+
     public function registrasi(Request $request)
     {
         $fields = $request->all();
@@ -24,6 +25,50 @@ class authController extends Controller
             'username' => 'required | unique:users',
             'email' => 'required | unique:users',
             'password' => 'required'
+        ],
+        [
+            '*.required' =>'data tidak boleh kosong!',
+            '*.*string'   => 'data harus berupa huruf!',
+            'username.unique' => 'username sudah tersedia, silahkan melakukan Log in',
+            'email.unique' => 'email sudah tersedia, silahkan melakukan log in',
+        ]
+        );
+
+        if ($validate->fails()){
+            return response()->json([
+                'status' => 422,
+                'error' => $validate->errors()
+            ]);
+        }
+
+        $user = User::create([
+            'nama' => $fields['nama'],
+            'username' => $fields['username'],
+            'email' => $fields['email'],
+            'password'=> bcrypt($fields['password'])
+        ]);
+
+        $response = [
+            'success' => true,
+            'message' => 'Berhasil Registrasi, silahkan melakukan LogIn',
+            'data' => $user 
+        ];
+        return response($response, 201);
+    }
+
+    public function get_registrasi(Request $request)
+    {
+        $fields = $request->all();
+
+        $validate = Validator::make($request->all(), [
+            'nama' => 'required | string',
+            'username' => 'required | unique:users',
+            'email' => 'required | unique:users',
+            'password' => 'required',
+            'jenisKelamin' => 'required',
+            'tempatLahir' =>'required',
+            'tanggalLahir' => 'required',
+            'alamat' => 'required'
         ],
         [
             '*.required' =>'data tidak boleh kosong!',
@@ -115,64 +160,146 @@ class authController extends Controller
 //
 
 // filter data
-    public function allData(Request $request)
+    // ini buat show semua data 
+    public function allData()
     {
         $data = book::select('*')->get();
-
-        $data = $data->orderBy('created_at', 'DESC');
         
-        $response = [
-            'success' => true,
-            'message' => 'Data Buku',
-            'data' => $data 
-        ];
-        return response($response, 200);
-    }
-
-    public function onlyKategori(Request $request)
-    {
-        $data = kategori::with('buku.kategori')->get();
-
-        if(!empty($request->req))
+        if(!empty($data))
         {
-            $data = $data->where('namaKategori', 'LIKE', $request->req);
+            $show = $data->orderBy('created_at', 'DESC');
+            
+            $response = [
+                'success' => true,
+                'message' => 'Data Buku',
+                'data' => $show
+            ];
+            return response($response, 200);
         }
-        
-        $response = [
-            'success' => true,
-            'message' => 'Data Buku kategori',
-            'data' => $data 
-        ];
+    }
 
-        return response($response, 200);
+    //
+    // public function onlyKategori(Request $request)
+    // {
+    //     $data = kategori::select('*');
+
+    //     if(!empty($data))
+    //     {
+    //         $show = kategori::with('buku.kategori')->where('namaKategori', 'ilike','%'.$request->req.'%')->paginate(100);
+
+    //         $response = [
+    //             'success' => true,
+    //             'message' => 'Data Buku kategori',
+    //             'data' => $data 
+    //         ];
+    //     return response($response, 200);
+    //     }
+
+    //     return  kategori::with('buku.kategori')->where('namaKategori', 'ilike','%'.$request->req.'%')->paginate(100);
+
+    //     if(!empty($request->req))
+    //     {
+    //         $data = $data->where('namaKategori', 'lIKE', '%'.$request->req.'%');
+    //     }
+        
+    //     // $response = [
+    //     //     'success' => true,
+    //     //     'message' => 'Data Buku kategori',
+    //     //     'data' => $data 
+    //     // ];
+
+    //     // return response($response, 200);
+
+    // }
+
+    // select data per kategori
+    public function getDataKategori($kategori)
+    {
+        $coba = kategori::select('*')->with('buku.kategori');
+
+        if(!empty($coba))
+        {
+            $data = $coba->where('namaKategori', 'ilike', '%' . $kategori . '%')->get();
+
+            $response = [
+                'success' => true,
+                'message' => 'Data Buku kategori',
+                'data' => $data 
+            ];
+
+            return response($response, 200);
+        }
+        $response = [
+            'success' => false,
+            'message' => 'data tidak ditemukan!',
+            'data' => null
+        ];
+        return response($response, 400);
 
     }
 
+    // ini buat liat data buku by id
+    public function get_details($id)
+    {
+        $buku = book::select('*')->get();
+        $validasi = book::select('id');
+    
+        if(!empty($validasi))
+        {
+            $data = $buku->where('id', $id);
+    
+            $response = [
+                'success' => true,
+                'message' => 'berikut details buku',
+                'data' => $data
+            ];
+            return response($response, 200); 
+        }
+        $response = [
+            'success' => false,
+            'message' => 'data tidak ditemukan!',
+            'data' => null
+        ];
+        return response($response, 400);
+    }
+
+    // ini fitur search
     public function search($judul)
     {
-        return book::where("judul", 'Like' , '%' . $judul . '%')->get();
+        // if($judul != null)
+        // {
+            $data = book::where('judul', 'like', '%' . $judul . '%')->get();
 
-        $response = [
-            'success' => true,
-            'message' => 'berikut Data buku'
-        ];
-
-        return response($response, 200);
+            $response = [
+                'success' => true,
+                'message' => 'Data Buku',
+                'data' => $data
+            ];
+            return response($response, 200);
+        // }
+        // else
+        // {
+        //     $response = [
+        //         'success' => false,
+        //         'message' => 'Data tidak ditemukan!',
+        //         'data' => null 
+        //     ];
+        //     return response($response, 422);
+        // }
     }
 
-    public function get_details(Request $request)
-    {
-        $buku = book::select('cover', 'judul', 'sinopsis', 'tahunTerbit', 'harga');
+    // public function dataProfile()
+    // {
+    //     $data = book::select('nama', 'username', 'email', 'jenisKelamin', 'tempatLahir', 'tanggalLahir', 'alamat')->get();
 
-        $buku = $buku->where('id', $request->id)->get();
-
-        $response = [
-            'success' => true,
-            'message' => 'berikut details buku',
-            'data' => $buku
-        ];
-
-        return response($response, 200); 
-    }
+    //     // $data = $data->orderBy('created_at', 'DESC');
+        
+    //     $response = [
+    //         'success' => true,
+    //         'message' => 'Data Buku',
+    //         'data' => $data 
+    //     ];
+    //     return response($response, 200);
+    // }
 //
 }
