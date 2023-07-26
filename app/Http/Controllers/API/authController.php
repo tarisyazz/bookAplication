@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\api;
+namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\book;
@@ -163,11 +163,11 @@ class authController extends Controller
     // ini buat show semua data 
     public function allData()
     {
-        $data = book::select('*')->get();
+        $data = book::select('*');
         
         if(!empty($data))
         {
-            $show = $data->orderBy('created_at', 'DESC');
+            $show = $data->orderBy('created_at', 'DESC')->get();
             
             $response = [
                 'success' => true,
