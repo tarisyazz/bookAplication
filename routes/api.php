@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [authController::class, 'registrasi']); // ini yang rika
 Route::post('/getRegister', [authController::class, 'get_registrasi']); // ini yang nida
-Route::post('/login', [authController::class, 'login']);
+Route::post('/login', [authController::class, 'login']);// ini buat login
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
 
@@ -29,27 +29,16 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/buku', [authController::class, 'allData']); // liat semua data
     Route::get('/kategori/data/buku/{namaKategori}', [authController::class, 'getDataKategori']); // liat data sesuai kategori
     Route::get('/showDetails/{id}', [authController::class, 'get_details']); // ini buat liat details buku
-
-
-
+    Route::get('/buku/judul/{judul}', [authController::class, 'search']); // ini search
     Route::get('/kategori/buku', [authController::class, 'onlyKategori']); // ini belum
 
 
-
-
-
-    Route::get('/buku/judul/{judul}', [authController::class, 'search']);
-
-    Route::get('/allProfile', [authController::class, 'dataProfile']);
-
-
-
-
-
-    route::post('/logout', [authController::class, 'logout']);
+    route::post('/logout', [authController::class, 'logout']); // logout
 });
 
 
+Route::get('/kategori/buku', [authController::class, 'onlyKategori']); // ini belum
+Route::get('/allProfile', [authController::class, 'dataProfile']);
 
 
 
