@@ -203,7 +203,7 @@ class authController extends Controller
 
         if(!empty($coba))
         {
-            $data = $coba->where('namaKategori', $kategori )->get();
+            $data = $coba->where('namaKategori', 'ilike',  $kategori )->get();
 
             $response = [
                 'success' => true,
