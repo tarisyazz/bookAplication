@@ -226,17 +226,17 @@ class authController extends Controller
     public function get_details($id)
     {
         $buku = book::select('*')->get();
-        $validasi = book::select('id');
+        $validasi = book::select('id')->get();
     
         if(!empty($validasi))
         {
-            // $data = $buku->where('id', $id);
-            $buku->where('id', $id);
+            $data = $buku->where('id', $id);
+            // $buku->where('id', $id);
 
             $response = [
                 'success' => true,
                 'message' => 'berikut details buku',
-                'data' => $buku
+                'data' => $data
             ];
             return response($response, 200); 
         }
@@ -254,7 +254,15 @@ class authController extends Controller
         // if($judul != null)
         // {
             $data = book::where('judul', 'like', '%' . $judul . '%')->get();
-
+            if(empty($judul))
+            {
+                $response = [
+                            'success' => false,
+                            'message' => 'Data tidak ditemukan!',
+                            'data' => null 
+                        ];
+                return response($response, 422);
+            }
             $response = [
                 'success' => true,
                 'message' => 'Data Buku',
