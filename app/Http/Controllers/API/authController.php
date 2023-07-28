@@ -230,12 +230,13 @@ class authController extends Controller
     
         if(!empty($validasi))
         {
-            $data = $buku->where('id', $id);
-    
+            // $data = $buku->where('id', $id);
+            $buku->where('id', $id);
+
             $response = [
                 'success' => true,
                 'message' => 'berikut details buku',
-                'data' => $data
+                'data' => $buku
             ];
             return response($response, 200); 
         }
